@@ -9,10 +9,10 @@ namespace ProxyTm
 	{
 		readonly HttpListener _listener;
 		private readonly Speller _speller;
-		public NetworkProcessor(int port)
+		public NetworkProcessor(int port, int wordSize)
 		{
 			_listener = new HttpListener();
-			_speller = new Speller();
+			_speller = new Speller(wordSize);
 			_listener.Prefixes.Add(string.Format("http://*:{0}/", port));
 			Console.WriteLine("Listening on port {0}...", port);
 		}
