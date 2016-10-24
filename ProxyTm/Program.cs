@@ -20,9 +20,8 @@ namespace ProxyTm
 			WebHelper.LocalUrl = "http://localhost:" + port;
 			WebHelper.RemoteUrl = "https://" + url;
 
-
 			var server = new NetworkProcessor(port, wordSize);
-			Task listen = new Task(() => server.Start());
+			var listen = new Task(() => server.Start());
 			listen.Start();
 			Console.WriteLine("Для остановки сервера нажмите ENTER...");
 			Console.ReadLine();

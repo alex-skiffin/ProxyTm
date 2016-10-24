@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Text;
 
@@ -7,14 +6,16 @@ namespace ProxyTm
 {
 	public class NetworkProcessor
 	{
-		readonly HttpListener _listener;
+		private readonly HttpListener _listener;
 		private readonly Speller _speller;
 		public NetworkProcessor(int port, int wordSize)
 		{
 			_listener = new HttpListener();
+			_listener.Prefixes.Add($"http://*:{port}/");
+
 			_speller = new Speller(wordSize);
-			_listener.Prefixes.Add(string.Format("http://*:{0}/", port));
-			Console.WriteLine("Listening on port {0}...", port);
+
+			Console.WriteLine($"Listening on port {port}...");
 		}
 
 		public void Start()
@@ -40,18 +41,14 @@ namespace ProxyTm
 			HttpListenerRequest request = context.Request;
 			HttpListenerResponse response = context.Response;
 
-			Stream inputStream = request.InputStream;
-			Encoding encoding = request.ContentEncoding;
-			var reader = new StreamReader(inputStream, encoding);
-			string requestBody = reader.ReadToEnd();
-
-			Console.WriteLine("Request was caught: {0}", request.Url);
+			Console.WriteLine($"Request was caught: {request.Url}");
 
 			var result = string.Empty;
 			try
 			{
-				using (var client = new WebClient { Encoding = Encoding.UTF8 })
+				using (var client = new WebClient())
 				{
+					client.Encoding = Encoding.UTF8;
 					result = client.DownloadString(WebHelper.RemoteUrl + request.Url.AbsolutePath);
 				}
 				response.StatusCode = (int)HttpStatusCode.OK;
