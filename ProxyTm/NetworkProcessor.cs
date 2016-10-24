@@ -42,16 +42,15 @@ namespace ProxyTm
 
 			Stream inputStream = request.InputStream;
 			Encoding encoding = request.ContentEncoding;
-			StreamReader reader = new StreamReader(inputStream, encoding);
-			var requestBody = reader.ReadToEnd();
+			var reader = new StreamReader(inputStream, encoding);
+			string requestBody = reader.ReadToEnd();
 
 			Console.WriteLine("Request was caught: {0}", request.Url);
 
-			string result = "";
+			var result = string.Empty;
 			try
 			{
-				string responseData = string.Empty;
-				using (var client = new WebClient() { Encoding = Encoding.UTF8 })
+				using (var client = new WebClient { Encoding = Encoding.UTF8 })
 				{
 					result = client.DownloadString(WebHelper.RemoteUrl + request.Url.AbsolutePath);
 				}
@@ -66,29 +65,16 @@ namespace ProxyTm
 			result = WebHelper.ReplaceUrl(result);
 			result = _speller.Replace(result);
 
-			Encoding win1251 = Encoding.GetEncoding("utf-8");
-			UTF8Encoding utf = new UTF8Encoding();
-			byte[] encodedBytes = win1251.GetBytes(result);
-			string temp = utf.GetString(encodedBytes);
-			byte[] utfEncodedBytes = Encoding.UTF8.GetBytes(temp);
+			var win1251 = Encoding.GetEncoding("utf-8");
+			var utf = new UTF8Encoding();
+			var encodedBytes = win1251.GetBytes(result);
+			var temp = utf.GetString(encodedBytes);
+			var utfEncodedBytes = Encoding.UTF8.GetBytes(temp);
 
 			context.Response.ContentLength64 = utfEncodedBytes.Length;
 			context.Response.OutputStream.Write(utfEncodedBytes, 0, utfEncodedBytes.Length);
 
 			context.Response.Headers.Add(HttpResponseHeader.ContentEncoding, Encoding.UTF8.EncodingName);
-		}
-
-		public void Stop()
-		{
-			if (_listener != null)
-			{
-				_listener.Stop();
-			}
-		}
-
-		~NetworkProcessor()
-		{
-			Stop();
 		}
 	}
 }
