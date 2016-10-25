@@ -46,8 +46,7 @@
     <Compile Include="NetworkProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Speller.cs" />
-    <Compile Include="WebHelper.cs" />
+    <Compile Include="Replacer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

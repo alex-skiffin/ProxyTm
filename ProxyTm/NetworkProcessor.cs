@@ -7,13 +7,16 @@ namespace ProxyTm
 	public class NetworkProcessor
 	{
 		private readonly HttpListener _listener;
-		private readonly Speller _speller;
-		public NetworkProcessor(int port, int wordSize)
+		private readonly Replacer _replacer;
+		private readonly string _url;
+		
+		public NetworkProcessor(int port, string url, Replacer replacer)
 		{
+			_url = url;
 			_listener = new HttpListener();
 			_listener.Prefixes.Add($"http://*:{port}/");
 
-			_speller = new Speller(wordSize);
+			_replacer = replacer;
 
 			Console.WriteLine($"Listening on port {port}...");
 		}
@@ -26,7 +29,7 @@ namespace ProxyTm
 			{
 				try
 				{
-					Method();
+					ReadAndReplace();
 				}
 				catch (Exception exception)
 				{
@@ -35,7 +38,7 @@ namespace ProxyTm
 			}
 		}
 
-		private void Method()
+		private void ReadAndReplace()
 		{
 			HttpListenerContext context = _listener.GetContext();
 			HttpListenerRequest request = context.Request;
@@ -49,7 +52,7 @@ namespace ProxyTm
 				using (var client = new WebClient())
 				{
 					client.Encoding = Encoding.UTF8;
-					result = client.DownloadString(WebHelper.RemoteUrl + request.Url.AbsolutePath);
+					result = client.DownloadString(_url + request.Url.AbsolutePath);
 				}
 				response.StatusCode = (int)HttpStatusCode.OK;
 			}
@@ -59,8 +62,7 @@ namespace ProxyTm
 				response.StatusCode = (int)HttpStatusCode.BadRequest;
 			}
 			
-			result = WebHelper.ReplaceUrl(result);
-			result = _speller.Replace(result);
+			result = _replacer.Replace(result);
 
 			var win1251 = Encoding.GetEncoding("utf-8");
 			var utf = new UTF8Encoding();

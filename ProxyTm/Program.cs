@@ -9,7 +9,7 @@ namespace ProxyTm
 		{
 			int port = 7070;
 			int wordSize = 6;
-			string url = "habrahabr.ru";
+			string url = "https://habrahabr.ru";
 			if (args.Length > 0)
 				int.TryParse(args[0], out port);
 			if (args.Length > 1)
@@ -17,10 +17,9 @@ namespace ProxyTm
 			if (args.Length > 2)
 				int.TryParse(args[2], out wordSize);
 
-			WebHelper.LocalUrl = "http://localhost:" + port;
-			WebHelper.RemoteUrl = "https://" + url;
+			var replacer = new Replacer(wordSize, port, url);
 
-			var server = new NetworkProcessor(port, wordSize);
+			var server = new NetworkProcessor(port, url, replacer);
 			var listen = new Task(() => server.Start());
 			listen.Start();
 			Console.WriteLine("Для остановки сервера нажмите ENTER...");
