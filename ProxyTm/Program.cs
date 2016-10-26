@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Threading.Tasks;
 
 namespace ProxyTm
@@ -7,9 +8,16 @@ namespace ProxyTm
 	{
 		static void Main(string[] args)
 		{
-			int port = 7070;
-			int wordSize = 6;
-			string url = "https://habrahabr.ru";
+			var settings = ProxySettingsHelper.ReadConfig();
+			if (settings == null)
+			{
+				settings = new ProxySettings();
+				ProxySettingsHelper.WriteConfig(settings);
+			}
+			int port = settings.Port;
+			int wordSize = settings.WordSize;
+			string url = settings.Url;
+
 			if (args.Length > 0)
 				int.TryParse(args[0], out port);
 			if (args.Length > 1)
